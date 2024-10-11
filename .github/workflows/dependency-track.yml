@@ -2,9 +2,6 @@ name: Dependency Track Upload
 
 on:
   push:
-    branches:
-      - 'main'
-      - 'master'
 
 jobs:
   php_sbom:
