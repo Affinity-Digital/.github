@@ -22,7 +22,7 @@ jobs:
             COMPOSER_TOKEN: ${{ inputs.GITHUB_TOKEN }}
 
       - name: Install required tools
-        run: sudo apt-get install -y build-essential libxml2-utils 
+        run: sudo apt-get install -y build-essential libxml2-utils cyclonedx-cli
 
       - name: Install Composer dependencies
         run: |
