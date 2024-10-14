@@ -27,6 +27,7 @@ jobs:
       - name: Install CycloneDX
         run: |
           wget https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
+          chmod +x /usr/local/bin/cyclonedx-cli
 
       - name: Install Composer dependencies
         run: |
