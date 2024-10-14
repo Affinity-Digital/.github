@@ -22,22 +22,22 @@ jobs:
             COMPOSER_TOKEN: ${{ inputs.GITHUB_TOKEN }}
 
       - name: Install required tools
-        run: sudo apt-get install -y build-essential libxml2-utils
+        run: sudo apt-get install -y build-essential libxml2-utils 
 
       - name: Install Composer dependencies
         run: composer require --dev cyclonedx/cyclonedx-php-composer
 
       - name: Generate BoM
         run: |
-            composer cyclonedx:generate --output bom.xml
-            cyclonedx-cli convert --input-file bom.xml --output-file sbom.xml --output-format json_v1_2
+          composer cyclonedx:make-sbom --output-file bom.xml --spec-version="1.2"
+          cyclonedx-cli convert --input-file bom.xml --output-file sbom.xml --output-format json_v1_2
       
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
-            serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
-            apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-            projectName: ${{ github.repository }}
-            projectVersion: ${{ github.ref_name }}
-            bomFilename: "sbom.xml"
-            autoCreate: true
+          serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
+          apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectName: ${{ github.repository }}
+          projectVersion: ${{ github.ref_name }}
+          bomFilename: "sbom.xml"
+          autoCreate: true
