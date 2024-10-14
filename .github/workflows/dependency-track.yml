@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload to Depdenency Track
         run: |
-          upload_bom=$(curl -s --location --request POST ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom \
+          upload_bom=$(curl -s --location --request POST https://${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom \
             --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" \
             --header "Content-Type: multipart/form-data" \
             --form "autoCreate=true" \
@@ -74,14 +74,14 @@ jobs:
 
           echo "[*] Checking BoM processing status"
           processing=$(curl -s --location --request GET \
-            ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
+            https://${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
             --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" | jq '.processing'
           )
 
           while [ $processing = true ]; do
             sleep 5
             processing=$(curl -s --location --request GET \
-              ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
+              https://${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
               --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" | jq '.processing'
             )
             if [ $((++c)) -eq 10 ]; then
@@ -99,7 +99,7 @@ jobs:
 
           echo "[*] Retrieving project information"
           project=$(curl -s --location --request GET \
-            "${{ vars.DEPENDENCYTRACK_API }}/api/v1/project/lookup?name=${{ github.repository }}&version=${{ github.sha }}"" \
+            "https://${{ vars.DEPENDENCYTRACK_API }}/api/v1/project/lookup?name=${{ github.repository }}&version=${{ github.sha }}"" \
             --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}"
           )
 
