@@ -44,7 +44,7 @@ jobs:
         with:
           serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
           apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-          projectName: ${{ github.repository }}
-          projectVersion: ${{ github.sha }}
+          projectName: ${{ github.event.repository.name }}
+          projectVersion: ${{ github.head_ref || github.ref_name }} 
           bomFilename: "sbom.xml"
           autoCreate: true
