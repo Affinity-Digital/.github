@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate BoM
         run: |
-          composer cyclonedx:make-sbom --output-file bom.xml --spec-version="1.2"
+          composer CycloneDX:make-sbom --output-file bom.xml --spec-version="1.2"
           cyclonedx-cli convert --input-file bom.xml --output-file sbom.xml --output-format json_v1_2
       
       - name: Upload to Depdenency Track
