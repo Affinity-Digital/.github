@@ -36,16 +36,76 @@ jobs:
 
       - name: Generate BoM
         run: |
-          composer
           composer CycloneDX:make-sbom --output-file bom.xml --spec-version="1.2"
           cyclonedx-cli convert --input-file bom.xml --output-file sbom.xml --output-format json --output-version v1_2
       
+      # - name: Upload to Depdenency Track
+      #   uses: DependencyTrack/gh-upload-sbom@v3
+      #   with:
+      #     serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
+      #     apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+      #     projectName: ${{ github.repository }}
+      #     projectVersion: ${{ github.sha }}
+      #     bomFilename: "sbom.xml"
+      #     autoCreate: true
+
       - name: Upload to Depdenency Track
-        uses: DependencyTrack/gh-upload-sbom@v3
-        with:
-          serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
-          apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-          projectName: ${{ github.repository }}
-          projectVersion: ${{ github.ref_name }}
-          bomFilename: "sbom.xml"
-          autoCreate: true
+        run: |
+          upload_bom=$(curl -s --location --request POST ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom \
+            --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" \
+            --header "Content-Type: multipart/form-data" \
+            --form "autoCreate=true" \
+            --form "projectName=${{ github.repository }}" \
+            --form "projectVersion=${{ github.sha }}" \
+            --form "bom=@sbom.xml")
+
+          token=$(echo $upload_bom | jq ".token" | tr -d "\"")
+          echo "token=$token" >> $GITHUB_OUTPUT
+
+          echo "[*] BoM file succesfully uploaded with token $token"
+
+      - name: Checking BoM processing status
+        run: |
+          token=${{ steps.env-setup.outputs.token }}
+          if [ -z $token ]; then
+            echo "[-]  The BoM file has not been successfully processed by OWASP Dependency Track"
+            exit 1
+          fi
+
+          echo "[*] Checking BoM processing status"
+          processing=$(curl -s --location --request GET \
+            ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
+            --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" | jq '.processing'
+          )
+
+          while [ $processing = true ]; do
+            sleep 5
+            processing=$(curl -s --location --request GET \
+              ${{ vars.DEPENDENCYTRACK_API }}/api/v1/bom/token/$token \
+              --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}" | jq '.processing'
+            )
+            if [ $((++c)) -eq 10 ]; then
+              echo "[-]  Timeout while waiting for processing result. Please check the OWASP Dependency Track status."
+              exit 1
+            fi
+          done
+
+          echo "[*] OWASP Dependency Track processing completed"
+      
+      - name: Getting project score
+        run: |
+          # wait to make sure the score is available, some errors found during tests w/o this wait
+          sleep 5
+
+          echo "[*] Retrieving project information"
+          project=$(curl -s --location --request GET \
+            "${{ vars.DEPENDENCYTRACK_API }}/api/v1/project/lookup?name=${{ github.repository }}&version=${{ github.sha }}"" \
+            --header "X-Api-Key: ${{ secrets.DEPENDENCYTRACK_API_KEY }}"
+          )
+
+          echo "$project"
+
+          project_uuid=$(echo $project | jq ".uuid" | tr -d "\"")
+          risk_score=$(echo $project | jq ".lastInheritedRiskScore")
+          echo "Project risk score: $risk_score"
+          echo "risk_score=$risk_score" >> $GITHUB_OUTPUT
