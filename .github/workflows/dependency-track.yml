@@ -25,7 +25,9 @@ jobs:
         run: sudo apt-get install -y build-essential libxml2-utils 
 
       - name: Install Composer dependencies
-        run: composer global config --no-plugins allow-plugins.cyclonedx/cyclonedx-php-composer true
+        run: |
+          composer global config --no-plugins allow-plugins.cyclonedx/cyclonedx-php-composer true
+          composer global require cyclonedx/cyclonedx-php-composer
 
       - name: Generate BoM
         run: |
