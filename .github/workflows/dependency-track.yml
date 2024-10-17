@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Download PHP/Composer SBOM Result file
         uses: actions/download-artifact@v4
         with:
@@ -103,7 +103,9 @@ jobs:
           chmod +x /usr/local/bin/cyclonedx-cli
 
       - name: Merge SBOMs
-        run: cyclonedx-cli merge --input-files php-sbom.xml npm-sbom.xml --output-file sbom_all.xml
+        run: |
+          ls -la
+          cyclonedx-cli merge --input-files php-sbom.xml npm-sbom.xml --output-file sbom_all.xml
 
       - name: Convert SBOM
         run: cyclonedx-cli convert --input-file sbom_all.xml --output-file sbom.json --output-format json --output-version v1_2
