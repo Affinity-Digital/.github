@@ -83,7 +83,6 @@ jobs:
 
       - name: Generate BoM
         run: |
-          npm -g list
           cyclonedx-npm --output-format xml --output-file bom.xml --spec-version 1.2
           cyclonedx-cli convert --input-file bom.xml --output-file sbom.xml --output-format json --output-version v1_2
       
