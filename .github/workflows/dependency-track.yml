@@ -34,7 +34,6 @@ jobs:
       - name: Generate BoM
         run: |
           composer CycloneDX:make-sbom --output-file php-sbom.xml --spec-version="1.2"
-          ls -la
       
       - name: Store PHP/Composer SBOM
         uses: actions/upload-artifact@v4
@@ -105,7 +104,8 @@ jobs:
 
       - name: Merge SBOMs
         run: |
-          ls -la
+          chmod 644 php-sbom.xml
+          chmod 644 npm-sbom.xml
           cyclonedx-cli merge --input-files php-sbom.xml npm-sbom.xml --output-file sbom_all.xml
 
       - name: Convert SBOM
