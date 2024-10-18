@@ -20,6 +20,9 @@ jobs:
     name: Generate PHP SBOM
     runs-on: ubuntu-latest
 
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +52,16 @@ jobs:
       - name: Convert SBOM
         run: cyclonedx-cli convert --input-file sbom-php.xml --output-file sbom.json --output-format json --output-version v1_2
 
+      - name: Add default tags
+        run: |
+          export TAGS="PHP,Composer,Branch:${BRANCH_NAME}"
+          if [ -n "${{ inputs.tags }}" ]; then
+            export TAGS="${TAGS},${{ inputs.tags }}"
+          elif [ -n "${{ vars.DEPENDENCYTRACK_TAGS }}" ]; then
+            export TAGS="${TAGS},${{ vars.DEPENDENCYTRACK_TAGS }}"
+          fi
+          echo TAGS=$TAGS >> $GITHUB_ENV
+
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
@@ -57,13 +70,16 @@ jobs:
           projectName: ${{ github.event.repository.name }} PHP/Composer
           projectVersion: ${{ github.ref_name }}
           parent: ${{ inputs.parentProjectUuid || vars.DEPENDENCYTRACK_PARENT_PROJECT_UUID }}
-          projectTags: ${{ inputs.tags }}
+          projectTags: ${{ env.TAGS }}
           bomFilename: "sbom.json"
           autoCreate: true
 
   npm_sbom:
     name: Generate NPM SBOM
     runs-on: ubuntu-latest
+
+    env:
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
     steps:
       - uses: actions/checkout@v4
@@ -90,6 +106,16 @@ jobs:
       
       - name: Convert SBOM
         run: cyclonedx-cli convert --input-file sbom-npm.xml --output-file sbom.json --output-format json --output-version v1_2
+
+      - name: Add default tags
+        run: |
+          export TAGS="NPM,Branch:${BRANCH_NAME}"
+          if [ -n "${{ inputs.tags }}" ]; then
+            export TAGS="${TAGS},${{ inputs.tags }}"
+          elif [ -n "${{ vars.DEPENDENCYTRACK_TAGS }}" ]; then
+            export TAGS="${TAGS},${{ vars.DEPENDENCYTRACK_TAGS }}"
+          fi
+          echo TAGS=$TAGS >> $GITHUB_ENV
 
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
