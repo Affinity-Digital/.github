@@ -41,6 +41,9 @@ jobs:
       #     name: sbom-php
       #     path: sbom-php.xml
       #     retention-days: 5
+      
+      - name: Convert SBOM
+        run: cyclonedx-cli convert --input-file sbom-php.xml --output-file sbom.json --output-format json --output-version v1_2
 
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
@@ -82,6 +85,8 @@ jobs:
       #     path: sbom-npm.xml
       #     retention-days: 5
       
+      - name: Convert SBOM
+        run: cyclonedx-cli convert --input-file sbom-npm.xml --output-file sbom.json --output-format json --output-version v1_2
 
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
