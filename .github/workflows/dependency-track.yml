@@ -35,12 +35,24 @@ jobs:
         run: |
           composer CycloneDX:make-sbom --output-file sbom-php.xml --spec-version="1.2"
       
-      - name: Store PHP/Composer SBOM
-        uses: actions/upload-artifact@v4
+      # - name: Store PHP/Composer SBOM
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: sbom-php
+      #     path: sbom-php.xml
+      #     retention-days: 5
+
+      - name: Upload to Depdenency Track
+        uses: DependencyTrack/gh-upload-sbom@v3
         with:
-          name: sbom-php
-          path: sbom-php.xml
-          retention-days: 5
+          serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
+          apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectName: PHP/Composer
+          projectVersion: ${{ github.ref_name}}
+          parentName: ${{ github.event.repository.name }}
+          parentVersion: ${{ github.ref_name}}
+          bomFilename: "sbom.json"
+          autoCreate: true
 
   npm_sbom:
     name: Generate NPM SBOM
@@ -63,52 +75,65 @@ jobs:
       - name: Generate BoM
         run: cyclonedx-npm --output-format xml --output-file sbom-npm.xml --spec-version 1.2
       
-      - name: Store NPM SBOM
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-npm
-          path: sbom-npm.xml
-          retention-days: 5
-
-  merge_and_upload:
-    name: Merge and Upload SBOM
-    runs-on: ubuntu-latest
-
-    needs: [
-      php_sbom,
-      npm_sbom
-    ]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download SBOM Result files
-        uses: actions/download-artifact@v4
-        with:
-          pattern: sbom-*
-          path: ${{ github.workspace }}
-          merge-multiple: true
-
-      - name: Install required tools
-        run: sudo apt-get install -y build-essential libxml2-utils
-
-      - name: Install CycloneDX
-        run: |
-          wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
-          chmod +x /usr/local/bin/cyclonedx-cli
-
-      - name: Merge SBOMs
-        run: cyclonedx-cli merge --input-files sbom-php.xml sbom-npm.xml --output-file sbom-merge.xml
-
-      - name: Convert SBOM
-        run: cyclonedx-cli convert --input-file sbom-merge.xml --output-file sbom.json --output-format json --output-version v1_2
+      # - name: Store NPM SBOM
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: sbom-npm
+      #     path: sbom-npm.xml
+      #     retention-days: 5
+      
 
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
           serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
           apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-          projectName: ${{ github.event.repository.name }}
+          projectName: NPM
           projectVersion: ${{ github.ref_name}}
+          parentName: ${{ github.event.repository.name }}
+          parentVersion: ${{ github.ref_name}}
           bomFilename: "sbom.json"
           autoCreate: true
+
+  # merge_and_upload:
+  #   name: Merge and Upload SBOM
+  #   runs-on: ubuntu-latest
+
+  #   needs: [
+  #     php_sbom,
+  #     npm_sbom
+  #   ]
+
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Download SBOM Result files
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         pattern: sbom-*
+  #         path: ${{ github.workspace }}
+  #         merge-multiple: true
+
+  #     - name: Install required tools
+  #       run: sudo apt-get install -y build-essential libxml2-utils
+
+  #     - name: Install CycloneDX
+  #       run: |
+  #         wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
+  #         chmod +x /usr/local/bin/cyclonedx-cli
+
+  #     - name: Merge SBOMs
+  #       run: cyclonedx-cli merge --input-files sbom-php.xml sbom-npm.xml --output-file sbom-merge.xml
+
+  #     - name: Convert SBOM
+  #       run: cyclonedx-cli convert --input-file sbom-merge.xml --output-file sbom.json --output-format json --output-version v1_2
+
+  #     - name: Upload to Depdenency Track
+  #       uses: DependencyTrack/gh-upload-sbom@v3
+  #       with:
+  #         serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
+  #         apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+  #         projectName: ${{ github.event.repository.name }}
+  #         projectVersion: ${{ github.ref_name}}
+  #         bomFilename: "sbom.json"
+  #         autoCreate: true
