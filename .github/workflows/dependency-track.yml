@@ -33,13 +33,13 @@ jobs:
 
       - name: Generate BoM
         run: |
-          composer CycloneDX:make-sbom --output-file php-sbom.xml --spec-version="1.2"
+          composer CycloneDX:make-sbom --output-file sbom-php.xml --spec-version="1.2"
       
       - name: Store PHP/Composer SBOM
         uses: actions/upload-artifact@v4
         with:
-          name: php-sbom
-          path: php-sbom.xml
+          name: sbom-php
+          path: sbom-php.xml
           retention-days: 5
 
   npm_sbom:
@@ -61,13 +61,13 @@ jobs:
         run: npm install -g @cyclonedx/cyclonedx-npm
 
       - name: Generate BoM
-        run: cyclonedx-npm --output-format xml --output-file npm-sbom.xml --spec-version 1.2
+        run: cyclonedx-npm --output-format xml --output-file sbom-npm.xml --spec-version 1.2
       
       - name: Store NPM SBOM
         uses: actions/upload-artifact@v4
         with:
-          name: npm-sbom
-          path: npm-sbom.xml
+          name: sbom-npm
+          path: sbom-npm.xml
           retention-days: 5
 
   merge_and_upload:
@@ -82,34 +82,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download PHP/Composer SBOM Result file
+      - name: Download SBOM Result files
         uses: actions/download-artifact@v4
         with:
-          name: php-sbom
-          path: php-sbom.xml
-
-      - name: Download NPM SBOM Result file
-        uses: actions/download-artifact@v4
-        with:
-          name: npm-sbom
-          path: npm-sbom.xml
+          pattern: sbom-*
+          path: ${{ github.workspace }}
+          merge-multiple: true
 
       - name: Install required tools
         run: sudo apt-get install -y build-essential libxml2-utils
 
       - name: Install CycloneDX
         run: |
+          ls -la
           wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
           chmod +x /usr/local/bin/cyclonedx-cli
 
       - name: Merge SBOMs
-        run: |
-          chmod 644 php-sbom.xml
-          chmod 644 npm-sbom.xml
-          cyclonedx-cli merge --input-files php-sbom.xml npm-sbom.xml --output-file sbom_all.xml
+        run: cyclonedx-cli merge --input-files sbom-php.xml sbom-npm.xml --output-file sbom-merge.xml
 
       - name: Convert SBOM
-        run: cyclonedx-cli convert --input-file sbom_all.xml --output-file sbom.json --output-format json --output-version v1_2
+        run: cyclonedx-cli convert --input-file sbom-merge.xml --output-file sbom.json --output-format json --output-version v1_2
 
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
