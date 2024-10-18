@@ -94,7 +94,6 @@ jobs:
 
       - name: Install CycloneDX
         run: |
-          ls -la
           wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
           chmod +x /usr/local/bin/cyclonedx-cli
 
