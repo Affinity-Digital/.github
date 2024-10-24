@@ -7,6 +7,8 @@ on:
     branches: [ $default-branch ]
   workflow_call:
     inputs:
+      version:
+        type: string
       tags:
         type: string
       parentProjectUuid:
@@ -54,7 +56,7 @@ jobs:
 
       - name: Add default tags
         run: |
-          export TAGS="PHP,Composer,Branch:${BRANCH_NAME}"
+          export TAGS="Language:PHP,PackageManager:Composer,Branch:${BRANCH_NAME}"
           if [ -n "${{ inputs.tags }}" ]; then
             export TAGS="${TAGS},${{ inputs.tags }}"
           elif [ -n "${{ vars.DEPENDENCYTRACK_TAGS }}" ]; then
@@ -65,14 +67,14 @@ jobs:
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
-          serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
-          apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-          projectName: ${{ github.event.repository.name }} PHP/Composer
-          projectVersion: ${{ github.ref_name }}
+          serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
+          apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectname: ${{ github.event.repository.name }} PHP/Composer
+          projectversion: ${{ inputs.version || github.ref_name }}
           parent: ${{ inputs.parentProjectUuid || vars.DEPENDENCYTRACK_PARENT_PROJECT_UUID }}
-          projectTags: ${{ env.TAGS }}
-          bomFilename: "sbom.json"
-          autoCreate: true
+          projecttags: ${{ env.TAGS }}
+          bomfilename: "sbom.json"
+          autocreate: true
 
   npm_sbom:
     name: Generate NPM SBOM
@@ -109,7 +111,7 @@ jobs:
 
       - name: Add default tags
         run: |
-          export TAGS="NPM,Branch:${BRANCH_NAME}"
+          export TAGS="Language:NPM,PackageManager:NPM,Branch:${BRANCH_NAME}"
           if [ -n "${{ inputs.tags }}" ]; then
             export TAGS="${TAGS},${{ inputs.tags }}"
           elif [ -n "${{ vars.DEPENDENCYTRACK_TAGS }}" ]; then
@@ -120,11 +122,11 @@ jobs:
       - name: Upload to Depdenency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
-          serverHostname: ${{ vars.DEPENDENCYTRACK_API }}
-          apiKey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
-          projectName: ${{ github.event.repository.name }} NPM
-          projectVersion: ${{ github.ref_name }}
+          serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
+          apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
+          projectname: ${{ github.event.repository.name }} NPM
+          projectversion: ${{ inputs.version || github.ref_name }}
           parent: ${{ inputs.parentProjectUuid || vars.DEPENDENCYTRACK_PARENT_PROJECT_UUID }}
-          projectTags: ${{ inputs.tags }}
-          bomFilename: "sbom.json"
-          autoCreate: true
+          projecttags: ${{ inputs.tags }}
+          bomfilename: "sbom.json"
+          autocreate: true
