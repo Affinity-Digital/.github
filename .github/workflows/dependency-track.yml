@@ -92,7 +92,6 @@ jobs:
       - name: Install NPM modules
         run: |
           npm ci
-          npm audit fix --force
 
       - name: Install NPM dependencies
         run: npm install -g @cyclonedx/cyclonedx-npm
