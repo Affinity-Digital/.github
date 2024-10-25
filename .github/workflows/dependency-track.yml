@@ -91,7 +91,7 @@ jobs:
 
       - name: Install NPM modules
         run: |
-          npm install
+          npm ci
           npm audit fix --force
 
       - name: Install NPM dependencies
