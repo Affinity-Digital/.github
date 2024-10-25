@@ -64,7 +64,7 @@ jobs:
           fi
           echo TAGS=$TAGS >> $GITHUB_ENV
 
-      - name: Upload to Depdenency Track
+      - name: Upload to Dependency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
           serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
@@ -118,7 +118,7 @@ jobs:
           fi
           echo TAGS=$TAGS >> $GITHUB_ENV
 
-      - name: Upload to Depdenency Track
+      - name: Upload to Dependency Track
         uses: DependencyTrack/gh-upload-sbom@v3
         with:
           serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
