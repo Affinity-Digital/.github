@@ -64,7 +64,6 @@ jobs:
 
       - name: Generate BoM
         run: |
-          pwd
           cd ${{ inputs.composerDirectoryPath || inputs.directoryPath }}
           composer CycloneDX:make-sbom --output-file sbom-php.xml --spec-version="1.2"
 
@@ -76,6 +75,7 @@ jobs:
       
       - name: Convert SBOM
         run: cyclonedx-cli convert --input-file sbom-php.xml --output-file sbom.json --output-format json --output-version v1_2
+        working-directory: ${{ inputs.composerDirectoryPath || inputs.directoryPath }}
 
       - name: Add default tags
         run: |
