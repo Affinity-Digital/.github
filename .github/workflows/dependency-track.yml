@@ -13,6 +13,8 @@ on:
         type: string
       parentProjectUuid:
         type: string
+      directoryPath:
+        type: string
     secrets:
       DEPENDENCYTRACK_API_KEY:
         required: true
