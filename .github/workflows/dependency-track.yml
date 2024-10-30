@@ -9,12 +9,23 @@ on:
     inputs:
       version:
         type: string
+        description: 'The version of the project, defaults to the branch name'
       tags:
         type: string
+        description: 'Comma separated list of tags to apply to the project'
       parentProjectUuid:
         type: string
+        description: 'The UUID of the parent project'
       directoryPath:
         type: string
+        description: 'The directory path to scan for lock files, defaults to the root of the repository'
+        default: '.'
+      composerDirectoryPath:
+        type: string
+        description: 'The directory path for the composer.lock file, defaults to `directoryPath` if unset'
+      npmDirectoryPath:
+        type: string
+        description: 'The directory path for the package-lock.json file, defaults to `directoryPath` if unset'
     secrets:
       DEPENDENCYTRACK_API_KEY:
         required: true
@@ -29,6 +40,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check composer.lock file exists
+        run: |
+          cd ${{ inputs.composerDirectoryPath || inputs.directoryPath }}
+          if [ ! -f composer.lock ]; then
+            echo "composer.lock file not found in directory, skipping"
+            exit 0
+          fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -87,6 +106,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Check package-lock.json file exists
+        run: |
+          cd ${{ inputs.npmDirectoryPath || inputs.directoryPath }}
+          if [ ! -f package-lock.json ]; then
+            echo "package-lock.json file not found in directory, skipping"
+            exit 0
+          fi
 
       - name: Install NPM
         uses: actions/setup-node@v4
