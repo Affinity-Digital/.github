@@ -64,7 +64,7 @@ jobs:
 
       - name: Generate BoM
         run: |
-          cwd
+          pwd
           cd ${{ inputs.composerDirectoryPath || inputs.directoryPath }}
           composer CycloneDX:make-sbom --output-file sbom-php.xml --spec-version="1.2"
 
