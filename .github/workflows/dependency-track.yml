@@ -52,7 +52,7 @@ jobs:
 
       - name: Setup PHP
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@v2.31.1
         with:
             extensions: xml, mbstring
             tools: composer:v2
