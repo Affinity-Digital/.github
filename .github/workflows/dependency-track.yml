@@ -148,12 +148,12 @@ jobs:
 
       - name: Generate BoM
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        run: cyclonedx-npm --output-format xml --output-file sbom-npm.xml --spec-version 1.2
+        run: cyclonedx-npm --output-format xml --output-file sbom-npm.xml --spec-version 1.6
         working-directory: ${{ inputs.npmDirectoryPath || inputs.directoryPath }}
       
       - name: Convert SBOM
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        run: cyclonedx-cli convert --input-file sbom-npm.xml --output-file sbom.json --output-format json --output-version v1_2
+        run: cyclonedx-cli convert --input-file sbom-npm.xml --output-file sbom.json --output-format json --output-version v1_6
         working-directory: ${{ inputs.npmDirectoryPath || inputs.directoryPath }}
 
       - name: Add default tags
