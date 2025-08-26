@@ -62,8 +62,8 @@ jobs:
       - name: Install CycloneDX CLI
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
         run: |
-          apt update
-          apt-get install -y build-essential libxml2-utils
+          sudo apt update
+          sudo apt-get install -y build-essential libxml2-utils
           wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
           chmod +x /usr/local/bin/cyclonedx-cli
 
@@ -133,8 +133,8 @@ jobs:
       - name: Install CycloneDX CLI
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
         run: |
-          apt update
-          apt-get install -y build-essential libxml2-utils
+          sudo apt update
+          sudo apt-get install -y build-essential libxml2-utils
           wget -q https://github.com/CycloneDX/cyclonedx-cli/releases/latest/download/cyclonedx-linux-x64 -O /usr/local/bin/cyclonedx-cli
           chmod +x /usr/local/bin/cyclonedx-cli
 
