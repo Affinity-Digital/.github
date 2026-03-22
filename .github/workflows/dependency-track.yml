@@ -39,7 +39,7 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check composer.lock file exists
         id: lock-file-check
@@ -115,7 +115,7 @@ jobs:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check package-lock.json file exists
         id: lock-file-check
@@ -128,7 +128,7 @@ jobs:
 
       - name: Install NPM
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
 
       - name: Install CycloneDX CLI
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
