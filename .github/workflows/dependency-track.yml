@@ -107,6 +107,13 @@ jobs:
           bomfilename: "${{ inputs.composerDirectoryPath || inputs.directoryPath }}/sbom.json"
           autocreate: true
 
+      - name: Save the SBOM as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php-sbom
+          path: ${{ inputs.composerDirectoryPath || inputs.directoryPath }}/sbom.json
+          retention-days: 28
+
   npm_sbom:
     name: Generate NPM SBOM
     runs-on: ubuntu-latest
@@ -180,6 +187,13 @@ jobs:
           projectname: ${{ github.event.repository.name }} NPM
           projectversion: ${{ inputs.version || github.ref_name }}
           parent: ${{ inputs.parentProjectUuid || vars.DEPENDENCYTRACK_PARENT_PROJECT_UUID }}
-          projecttags: ${{ inputs.tags }}
+          projecttags: ${{ env.TAGS }}
           bomfilename: "${{ inputs.npmDirectoryPath || inputs.directoryPath }}/sbom.json"
           autocreate: true
+
+      - name: Save the SBOM as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-sbom
+          path: ${{ inputs.npmDirectoryPath || inputs.directoryPath }}/sbom.json
+          retention-days: 28
