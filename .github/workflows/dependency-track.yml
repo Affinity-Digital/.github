@@ -108,7 +108,7 @@ jobs:
           autocreate: true
 
       - name: Save the SBOM as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: php-sbom
           path: ${{ inputs.composerDirectoryPath || inputs.directoryPath }}/sbom.json
@@ -192,7 +192,7 @@ jobs:
           autocreate: true
 
       - name: Save the SBOM as an artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-sbom
           path: ${{ inputs.npmDirectoryPath || inputs.directoryPath }}/sbom.json
