@@ -96,7 +96,7 @@ jobs:
 
       - name: Upload to Dependency Track
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        uses: DependencyTrack/gh-upload-sbom@95c2b5a810450509ef8a67e4f854b42d2ddf7fbf # v4.1.0
+        uses: DependencyTrack/gh-upload-sbom@d8935b70f527d6aca6bbef5ab02db3933c9a8626 # v4.2.0
         with:
           serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
           apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
@@ -180,7 +180,7 @@ jobs:
 
       - name: Upload to Dependency Track
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        uses: DependencyTrack/gh-upload-sbom@95c2b5a810450509ef8a67e4f854b42d2ddf7fbf # v4.1.0
+        uses: DependencyTrack/gh-upload-sbom@d8935b70f527d6aca6bbef5ab02db3933c9a8626 # v4.2.0
         with:
           serverhostname: ${{ vars.DEPENDENCYTRACK_API }}
           apikey: ${{ secrets.DEPENDENCYTRACK_API_KEY }}
