@@ -40,6 +40,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check composer.lock file exists
         id: lock-file-check
@@ -123,6 +125,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Check package-lock.json file exists
         id: lock-file-check
@@ -149,7 +153,7 @@ jobs:
 
       - name: Install NPM dependencies
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
-        run: npm install -g @cyclonedx/cyclonedx-npm
+        run: npm install -g @cyclonedx/cyclonedx-npm xmlbuilder2
 
       - name: Install NPM modules
         if : ( steps.lock-file-check.outputs.skip != 'true' ) 
